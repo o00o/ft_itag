@@ -19,17 +19,17 @@ class MyApp extends StatelessWidget {
           builder: (context, snapshot) {
             final state = snapshot.data;
             if (state == BluetoothState.on) {
-              return FindItagScreen();
+              return FindItagPage();
             } else {
-              return BtOffScreen();
+              return BtOffPage();
             }
           }),
     );
   }
 }
 
-class BtOffScreen extends StatelessWidget {
-  const BtOffScreen({Key? key}) : super(key: key);
+class BtOffPage extends StatelessWidget {
+  const BtOffPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -42,14 +42,14 @@ class BtOffScreen extends StatelessWidget {
   }
 }
 
-class FindItagScreen extends StatefulWidget {
-  const FindItagScreen({Key? key}) : super(key: key);
+class FindItagPage extends StatefulWidget {
+  const FindItagPage({Key? key}) : super(key: key);
 
   @override
-  _FindItagScreenState createState() => _FindItagScreenState();
+  _FindItagPageState createState() => _FindItagPageState();
 }
 
-class _FindItagScreenState extends State<FindItagScreen> {
+class _FindItagPageState extends State<FindItagPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
