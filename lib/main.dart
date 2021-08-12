@@ -66,7 +66,7 @@ class FindItagPage extends StatelessWidget {
                               // แสดงค่า bt device id + name ที่scan เจอ + connect button
                               (r) => ScanResultItem(
                                     btScanResult: r,
-                                    // onTap: () { //// write onTap 1st style
+                                    // onTap: () { //// write onTap 1st style --> ok
                                     //   print('go to next page');
                                     //   Navigator.of(context).push(
                                     //       MaterialPageRoute(builder: (context) {
@@ -75,7 +75,7 @@ class FindItagPage extends StatelessWidget {
                                     //   }));
                                     // },
 
-                                    //// write onTap 2nd style
+                                    //// write onTap 2nd style --> ok
                                     onTap: () => Navigator.of(context).push(
                                         MaterialPageRoute(builder: (context) {
                                       r.device.connect();
@@ -136,6 +136,8 @@ class ScanResultItem extends StatelessWidget {
         trailing: ElevatedButton(
           child: Text('Connect'),
           onPressed:
+              // ถ้า btScanResult บอกว่าอุปกรณ์นี้ connect ไม่ได้
+              // จะdisable ปุ่มไม่ให้กดได้ โดย setค่า onPressed เป็น null
               (btScanResult.advertisementData.connectable) ? onTap : null,
         ),
         tileColor: Colors.grey.shade200,
