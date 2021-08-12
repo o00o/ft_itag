@@ -75,12 +75,36 @@ class FindItagPage extends StatelessWidget {
                                     //   }));
                                     // },
 
-                                    //// write onTap 2nd style --> ok
-                                    onTap: () => Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context) {
-                                      r.device.connect();
-                                      return SensorPage(device: r.device);
-                                    })),
+                                    // //// write onTap 2nd style --> ok
+                                    // onTap: () => Navigator.of(context).push(
+                                    //     MaterialPageRoute(builder: (context) {
+                                    //   r.device.connect();
+                                    //   return SensorPage(device: r.device);
+                                    // })),
+
+                                    // onTap: () {
+                                    //   //// write onTap 3.1nd method
+                                    //   // (disconnect device when press back from SensorPage) --> ok
+                                    //   print('go to next page');
+                                    //   Navigator.of(context).push(
+                                    //       MaterialPageRoute(builder: (context) {
+                                    //     r.device.connect();
+                                    //     return SensorPage(device: r.device);
+                                    //   })).then((context) => r.device.disconnect());
+                                    // },
+
+                                    onTap: () {
+                                      //// write onTap 3.2nd method
+                                      // (disconnect device when press back from SensorPage) --> ok
+                                      print('go to next page');
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(builder: (context) {
+                                        r.device.connect();
+                                        return SensorPage(device: r.device);
+                                      })).then((context) {
+                                        r.device.disconnect();
+                                      });
+                                    },
                                   ))
                           .toList());
                 },
