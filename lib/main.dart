@@ -111,7 +111,8 @@ class ScanResultItem extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       child: ListTile(
-        leading: Text('Mac Address: ${btScanResult.device.id}'),
+        leading: Text('${btScanResult.rssi}'),
+        title: Text('Mac Address: ${btScanResult.device.id}'),
         subtitle: Text('Device Name:${btScanResult.device.name}'),
         trailing: ElevatedButton(
           child: Text('Connect'),
