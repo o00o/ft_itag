@@ -75,12 +75,39 @@ class _FindItagPageState extends State<FindItagPage> {
           ],
         ),
       )),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.search),
-        onPressed: () {
-          FlutterBlue.instance.startScan(timeout: Duration(seconds: 4)); // ถ้าไม่ใส่ timeout ในการ scan มันจะ scan ไม่หยุดเลย, ไม่อย่างนั้นต้องสั่ง .stopScan
+      floatingActionButton: StreamBuilder<bool>(
+        stream: FlutterBlue.instance.isScanning, // stream ค่าสถานะการ scan ble ว่ากำลัว scan อยู่รึเปล่า
+        initialData: false,
+        builder: (context, snapdata) {
+          if (snapdata.data!) {
+            // bt is scanning
+            return FloatingActionButton(
+              child: Icon(Icons.stop),
+              onPressed: () {
+                // ถ้าระหว่างที่ bt กำลัง scan เรากด stop การ scan ได้
+                FlutterBlue.instance.stopScan();
+              },
+              backgroundColor: Colors.red,
+            );
+          } else {
+            // bt is NOT scanning
+            return FloatingActionButton(
+              child: Icon(Icons.search),
+              onPressed: () {
+                // ถ้าไม่ใส่ timeout ในการ scan มันจะ scan ไม่หยุดเลย, ไม่อย่างนั้นต้องสั่ง .stopScan
+                FlutterBlue.instance.startScan(timeout: Duration(seconds: 10));
+              },
+            );
+          }
         },
-      ),
+      )
     );
   }
 }
+
+// FloatingActionButton(
+// child: Icon(Icons.search),
+// onPressed: () {
+// FlutterBlue.instance.startScan(timeout: Duration(seconds: 4)); // ถ้าไม่ใส่ timeout ในการ scan มันจะ scan ไม่หยุดเลย, ไม่อย่างนั้นต้องสั่ง .stopScan
+// },
+// ),
