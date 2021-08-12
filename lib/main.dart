@@ -49,27 +49,28 @@ class FindItagPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Searching iTag ...'),
+          title: Text('Device List'),
         ),
-        body: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  StreamBuilder<List<ScanResult>>(
-                    stream: FlutterBlue.instance.scanResults,
-                    initialData: [],
-                    builder: (context, snapshot) {
-                      return Column(
-                          children: snapshot.data!
-                              .map(
-                            // เอาข้อมูล scanResult มาทำเป็น List ของ Widget Text แสดงค่า bt device id + name ที่scan เจอ
-                                  (r) => Text('id: ${r.device.id},  name: ${r.device.name}'))
-                              .toList());
-                    },
-                  )
-                ],
-              ),
-            )),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              StreamBuilder<List<ScanResult>>(
+                stream: FlutterBlue.instance.scanResults,
+                initialData: [],
+                builder: (context, snapshot) {
+                  return Column(
+                      children: snapshot.data!
+                          .map(
+                        // เอาข้อมูล scanResult มาทำเป็น List ของ Widget ScanResultItem
+                        // แสดงค่า bt device id + name ที่scan เจอ + connect button
+                          (r) => ScanResultItem(btScanResult: r,)
+                        )
+                          .toList());
+                },
+              )
+            ],
+          ),
+        ),
         floatingActionButton: StreamBuilder<bool>(
           stream: FlutterBlue.instance.isScanning, // stream ค่าสถานะการ scan ble ว่ากำลัว scan อยู่รึเปล่า
           initialData: false,
@@ -96,6 +97,28 @@ class FindItagPage extends StatelessWidget {
             }
           },
         )
-    );;
+    );
+  }
+}
+
+class ScanResultItem extends StatelessWidget {
+  const ScanResultItem({Key? key, required this.btScanResult}): super(key: key);
+
+  final ScanResult btScanResult;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+      child: ListTile(
+        leading: Text('Mac Address: ${btScanResult.device.id}'),
+        subtitle: Text('Device Name:${btScanResult.device.name}'),
+        trailing: ElevatedButton(
+          child: Text('Connect'),
+          onPressed: () {print('press button');},
+        ),
+        tileColor: Colors.grey.shade200,
+      ),
+    );
   }
 }
