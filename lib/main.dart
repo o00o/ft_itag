@@ -79,7 +79,7 @@ class FindItagPage extends StatelessWidget {
                                     onTap: () => Navigator.of(context).push(
                                         MaterialPageRoute(builder: (context) {
                                       r.device.connect();
-                                      return SensorPage();
+                                      return SensorPage(device: r.device);
                                     })),
                                   ))
                           .toList());
