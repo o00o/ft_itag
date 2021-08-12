@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart'; // use ble
+import 'package:ft_itag/pages/sensor_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -61,10 +62,26 @@ class FindItagPage extends StatelessWidget {
                   return Column(
                       children: snapshot.data!
                           .map(
-                        // เอาข้อมูล scanResult มาทำเป็น List ของ Widget ScanResultItem
-                        // แสดงค่า bt device id + name ที่scan เจอ + connect button
-                          (r) => ScanResultItem(btScanResult: r,)
-                        )
+                              // เอาข้อมูล scanResult มาทำเป็น List ของ Widget ScanResultItem
+                              // แสดงค่า bt device id + name ที่scan เจอ + connect button
+                              (r) => ScanResultItem(
+                                    btScanResult: r,
+                                    // onTap: () { //// write onTap 1st style
+                                    //   print('go to next page');
+                                    //   Navigator.of(context).push(
+                                    //       MaterialPageRoute(builder: (context) {
+                                    //     r.device.connect();
+                                    //     return SensorPage();
+                                    //   }));
+                                    // },
+
+                                    //// write onTap 2nd style
+                                    onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) {
+                                      r.device.connect();
+                                      return SensorPage();
+                                    })),
+                                  ))
                           .toList());
                 },
               )
@@ -72,7 +89,8 @@ class FindItagPage extends StatelessWidget {
           ),
         ),
         floatingActionButton: StreamBuilder<bool>(
-          stream: FlutterBlue.instance.isScanning, // stream ค่าสถานะการ scan ble ว่ากำลัว scan อยู่รึเปล่า
+          stream: FlutterBlue.instance.isScanning,
+          // stream ค่าสถานะการ scan ble ว่ากำลัว scan อยู่รึเปล่า
           initialData: false,
           builder: (context, snapshot) {
             if (snapshot.data!) {
@@ -96,15 +114,16 @@ class FindItagPage extends StatelessWidget {
               );
             }
           },
-        )
-    );
+        ));
   }
 }
 
 class ScanResultItem extends StatelessWidget {
-  const ScanResultItem({Key? key, required this.btScanResult}): super(key: key);
+  const ScanResultItem({Key? key, required this.btScanResult, this.onTap})
+      : super(key: key);
 
   final ScanResult btScanResult;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +135,8 @@ class ScanResultItem extends StatelessWidget {
         subtitle: Text('Device Name:${btScanResult.device.name}'),
         trailing: ElevatedButton(
           child: Text('Connect'),
-          onPressed: () {print('press button');},
+          onPressed:
+              (btScanResult.advertisementData.connectable) ? onTap : null,
         ),
         tileColor: Colors.grey.shade200,
       ),
