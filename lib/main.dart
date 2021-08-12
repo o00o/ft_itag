@@ -78,8 +78,8 @@ class _FindItagPageState extends State<FindItagPage> {
       floatingActionButton: StreamBuilder<bool>(
         stream: FlutterBlue.instance.isScanning, // stream ค่าสถานะการ scan ble ว่ากำลัว scan อยู่รึเปล่า
         initialData: false,
-        builder: (context, snapdata) {
-          if (snapdata.data!) {
+        builder: (context, snapshot) {
+          if (snapshot.data!) {
             // bt is scanning
             return FloatingActionButton(
               child: Icon(Icons.stop),
