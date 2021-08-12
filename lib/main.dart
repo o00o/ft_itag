@@ -78,7 +78,7 @@ class _FindItagPageState extends State<FindItagPage> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.search),
         onPressed: () {
-          FlutterBlue.instance.startScan(timeout: Duration(seconds: 4));
+          FlutterBlue.instance.startScan(timeout: Duration(seconds: 4)); // ถ้าไม่ใส่ timeout ในการ scan มันจะ scan ไม่หยุดเลย, ไม่อย่างนั้นต้องสั่ง .stopScan
         },
       ),
     );
