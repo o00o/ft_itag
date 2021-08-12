@@ -56,7 +56,31 @@ class _FindItagPageState extends State<FindItagPage> {
       appBar: AppBar(
         title: Text('Searching iTag ...'),
       ),
-      body: Center(child: Text('Searching iTag ...')),
+      body: Center(
+          child: SingleChildScrollView(
+        child: Column(
+          children: [
+            StreamBuilder<List<ScanResult>>(
+              stream: FlutterBlue.instance.scanResults,
+              initialData: [],
+              builder: (context, snapshot) {
+                return Column(
+                    children: snapshot.data!
+                        .map(
+                            // เอาข้อมูล scanResult มาทำเป็น List ของ Widget Text แสดงค่า bt device id + name ที่scan เจอ
+                            (r) => Text('id: ${r.device.id},  name: ${r.device.name}'))
+                        .toList());
+              },
+            )
+          ],
+        ),
+      )),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.search),
+        onPressed: () {
+          FlutterBlue.instance.startScan(timeout: Duration(seconds: 4));
+        },
+      ),
     );
   }
 }
