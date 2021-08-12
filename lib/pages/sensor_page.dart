@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'dart:async';
@@ -70,9 +72,16 @@ class _SensorPageState extends State<SensorPage> {
     List<BluetoothService> services = await widget.device.discoverServices();
     services.forEach((service) {
       print('- service: ${service.uuid.toString()}');
-      service.characteristics.forEach((characteristic) {
+      service.characteristics.forEach((characteristic) async {
         print('-- characteristic: ${characteristic.uuid.toString()}');
         print('   properties: read=${characteristic.properties.read}, write=${characteristic.properties.write}, notify=${characteristic.properties.notify}');
+        //// todo: set notify iTag button pressing
+        // if(characteristic.uuid == new Guid("0000ffe1-0000-1000-8000-00805f9b34fb")) {
+        //   //                    0000ffe1-0000-1000-8000-00805f9b34fb
+        //   print('match iTag button char. uuid');
+        //   await characteristic.setNotifyValue(true);
+        //   print('set notify successfully');
+        // }
         characteristic.descriptors.forEach((descriptor) {
           print('--- descriptor: ${descriptor.uuid.toString()}');
         });
@@ -93,6 +102,16 @@ class _SensorPageState extends State<SensorPage> {
         appBar: AppBar(
           title: Text('sensor page'),
         ),
-        body: Center(child: Text(_strDevice)));
+        body: Container(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(_strDevice),
+              ElevatedButton(onPressed: () {}, child: Text('Call iTag'))
+            ],
+          ),
+        ));
   }
 }
