@@ -41,7 +41,7 @@ class _SensorPageState extends State<SensorPage> {
     await widget.device.connect(); // connect bluetooth device
     print('Device (Mac Addr.: ${widget.device.id}) connected successful');
     isReady = true;
-    // discoverServices();
+    discoverServices();
   }
 
   disconnectFromDevice() {
@@ -58,6 +58,30 @@ class _SensorPageState extends State<SensorPage> {
 
   _Pop() {
     Navigator.of(context).pop(true);
+  }
+
+  discoverServices() async {
+    // if (widget.device == null) {
+    //   _Pop();
+    //   return;
+    // }
+
+    print('discoverServices: Device Mac Address: ${widget.device.id}');
+    List<BluetoothService> services = await widget.device.discoverServices();
+    services.forEach((service) {
+      print('- service: ${service.uuid.toString()}');
+      service.characteristics.forEach((characteristic) {
+        print('-- characteristic: ${characteristic.uuid.toString()}');
+        print('   properties: read=${characteristic.properties.read}, write=${characteristic.properties.write}, notify=${characteristic.properties.notify}');
+        characteristic.descriptors.forEach((descriptor) {
+          print('--- descriptor: ${descriptor.uuid.toString()}');
+        });
+      });
+    });
+
+    // if (!isReady) {
+    //   _Pop();
+    // }
   }
 
   @override
