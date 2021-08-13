@@ -25,7 +25,11 @@ dependencies:
     sdk: flutter
 
   #  use ble
-  flutter_blue: ^0.8.0
+#  flutter_blue: ^0.8.0
+
+  # use edited fluter_blue (edited by Som Api. 20210813)
+  flutter_blue:
+    path: ./flutter_blue-0.8.0-som/
 
 
   # The following adds the Cupertino Icons font to your application.

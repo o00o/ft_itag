@@ -87,13 +87,13 @@ class _SensorPageState extends State<SensorPage> {
           print('found char. uuid for writing iTag alarm on/off');
         }
 
-        //// todo: set notify iTag button pressing
-        // if(characteristic.uuid == new Guid("0000ffe1-0000-1000-8000-00805f9b34fb")) {
-        //   //                    0000ffe1-0000-1000-8000-00805f9b34fb
-        //   print('match iTag button char. uuid');
-        //   await characteristic.setNotifyValue(true);
-        //   print('set notify successfully');
-        // }
+        // set notify iTag button pressing
+        if(characteristic.uuid == new Guid("0000ffe1-0000-1000-8000-00805f9b34fb")) {
+          //                    0000ffe1-0000-1000-8000-00805f9b34fb
+          print('match iTag button char. uuid');
+          await characteristic.setNotifyValue(true);
+          print('set notify successfully');
+        }
         characteristic.descriptors.forEach((descriptor) {
           print('--- descriptor: ${descriptor.uuid.toString()}');
         });
