@@ -14,7 +14,9 @@ class SensorPage extends StatefulWidget {
 }
 
 class _SensorPageState extends State<SensorPage> {
-  bool isReady = false; // isReady
+  bool isReady = false; // isReady: true: finish discover available services
+  bool _isCallItag = false;
+  BluetoothCharacteristic? _btCharCallItag;
 
   @override
   void initState() {
@@ -42,8 +44,11 @@ class _SensorPageState extends State<SensorPage> {
     // await widget.device!.connect(); // connect bluetooth device
     await widget.device.connect(); // connect bluetooth device
     print('Device (Mac Addr.: ${widget.device.id}) connected successful');
-    isReady = true;
     discoverServices();
+    setState(() {
+      isReady =
+          true; // set ready flag when completed to discover the available services
+    });
   }
 
   disconnectFromDevice() {
@@ -74,7 +79,14 @@ class _SensorPageState extends State<SensorPage> {
       print('- service: ${service.uuid.toString()}');
       service.characteristics.forEach((characteristic) async {
         print('-- characteristic: ${characteristic.uuid.toString()}');
-        print('   properties: read=${characteristic.properties.read}, write=${characteristic.properties.write}, notify=${characteristic.properties.notify}');
+        print(
+            '   properties: read=${characteristic.properties.read}, write=${characteristic.properties.write}, notify=${characteristic.properties.notify}');
+        if (characteristic.uuid ==
+            new Guid("00002a06-0000-1000-8000-00805f9b34fb")) {
+          _btCharCallItag = characteristic;
+          print('found char. uuid for writing iTag alarm on/off');
+        }
+
         //// todo: set notify iTag button pressing
         // if(characteristic.uuid == new Guid("0000ffe1-0000-1000-8000-00805f9b34fb")) {
         //   //                    0000ffe1-0000-1000-8000-00805f9b34fb
@@ -102,16 +114,48 @@ class _SensorPageState extends State<SensorPage> {
         appBar: AppBar(
           title: Text('sensor page'),
         ),
-        body: Container(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(_strDevice),
-              ElevatedButton(onPressed: () {}, child: Text('Call iTag'))
-            ],
-          ),
-        ));
+        body: isReady
+            ? Container(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(_strDevice),
+                    ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            if (_btCharCallItag != null) {
+                              _isCallItag =
+                                  !_isCallItag; // toggle calling iTag status
+                              int _sendVal = _isCallItag ? 1 : 0;
+                              _btCharCallItag!.write([_sendVal],
+                                  withoutResponse:
+                                      true); // need to add bracket to _setVal bc. .write want List<int>
+                            }
+                          });
+                        },
+                        child: (_isCallItag)
+                            ? Text('Calling iTag',
+                                style: TextStyle(color: Colors.white))
+                            : Text('Call iTag',
+                                style: TextStyle(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        // onPrimary: Colors.green, // สี bg ของปุ่มจังหวะที่กดลง
+                        // primary: Colors.yellow, // สี bg ของปุ่มจังหวะปกติ (ตอนที่ยังไม่ได้กดลง)
+                        primary: (_isCallItag) // สี bg ของปุ่ม แบบมีเงื่อนไข
+                          ? Colors.green // elevated bt bg color when call iTag
+                          : null, // use default color
+                      ),
+                    )
+                  ],
+                ),
+              )
+            : Container(
+                child: Center(
+                  child:
+                      Text('Waiting ...', style: TextStyle(color: Colors.red)),
+                ),
+              ));
   }
 }
