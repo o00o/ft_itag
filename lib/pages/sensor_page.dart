@@ -17,6 +17,9 @@ class _SensorPageState extends State<SensorPage> {
   bool isReady = false; // isReady: true: finish discover available services
   bool _isCallItag = false;
   BluetoothCharacteristic? _btCharCallItag;
+  BluetoothCharacteristic? _btCharNotifyPressItagBt;
+  // Stream<List<int>>? _streamItagPressStatus;
+  // Map<Guid, List<int>> readValues = new Map<Guid, List<int>>();
 
   @override
   void initState() {
@@ -44,7 +47,21 @@ class _SensorPageState extends State<SensorPage> {
     // await widget.device!.connect(); // connect bluetooth device
     await widget.device.connect(); // connect bluetooth device
     print('Device (Mac Addr.: ${widget.device.id}) connected successful');
+
+    // //// try to get rssi simultaneously, BUT still work as expect --> ng
+    // FlutterBlue.instance.startScan();
+    // var subscription = FlutterBlue.instance.scanResults.listen((scanResults) {
+    //   print('new scan result');
+    //   scanResults.forEach((scanResult) {
+    //     if (scanResult.device.id == widget.device.id) {
+    //       print('rssi ${widget.device.id} found! rssi: ${scanResult.rssi}');
+    //     }
+    //   });
+    // });
+
     discoverServices();
+
+
     setState(() {
       isReady =
           true; // set ready flag when completed to discover the available services
@@ -88,11 +105,36 @@ class _SensorPageState extends State<SensorPage> {
         }
 
         // set notify iTag button pressing
-        if(characteristic.uuid == new Guid("0000ffe1-0000-1000-8000-00805f9b34fb")) {
+        if (characteristic.uuid ==
+            new Guid("0000ffe1-0000-1000-8000-00805f9b34fb")) {
           //                    0000ffe1-0000-1000-8000-00805f9b34fb
           print('match iTag button char. uuid');
-          await characteristic.setNotifyValue(true);
+          _btCharNotifyPressItagBt = characteristic;
+          _btCharNotifyPressItagBt!.value.listen((value) { //ok
+            print('callback0 of _btCharCallItag value=${value}');
+          });
+
+          print('start setting notify to true');
+          // await characteristic.setNotifyValue(true);
+          await _btCharNotifyPressItagBt!.setNotifyValue(true); // ?? why setNotifyValue has not finished ?
           print('set notify successfully');
+
+
+          // _btCharNotifyPressItagBt!.value.listen((value) { //ng1
+          //   print('callback1 of _btCharCallItag value=${value}');
+          // });
+
+          // _streamItagPressStatus = characteristic.value; //ng2
+
+          // _btCharNotifyPressItagBt!.value.listen((value) { // ng3
+          //   print('callback3 of _btCharCallItag value=${value}');
+          //   readValues[characteristic.uuid] = value;
+          // });
+
+          // characteristic.value.listen((value) { //ng4
+          //   print('callback4 of _btCharCallItag value=${value}');
+          // });
+
         }
         characteristic.descriptors.forEach((descriptor) {
           print('--- descriptor: ${descriptor.uuid.toString()}');
@@ -110,6 +152,15 @@ class _SensorPageState extends State<SensorPage> {
     String _strDevice = 'Welcome to sensor page';
     _strDevice = _strDevice + '\nMac Address: ${widget.device.id}';
     _strDevice = _strDevice + '\nDevice Name: ${widget.device.name}';
+
+
+    // if (_btCharNotifyPressItagBt != null) {
+    //   _btCharNotifyPressItagBt!.value.listen((value) {
+    //     print('callback111 of _btCharCallItag value=${value}');
+    //   });
+    // }
+
+
     return Scaffold(
         appBar: AppBar(
           title: Text('sensor page'),
@@ -123,29 +174,40 @@ class _SensorPageState extends State<SensorPage> {
                   children: [
                     Text(_strDevice),
                     ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            if (_btCharCallItag != null) {
-                              _isCallItag =
-                                  !_isCallItag; // toggle calling iTag status
-                              int _sendVal = _isCallItag ? 1 : 0;
-                              _btCharCallItag!.write([_sendVal],
-                                  withoutResponse:
-                                      true); // need to add bracket to _setVal bc. .write want List<int>
-                            }
-                          });
-                        },
-                        child: (_isCallItag)
-                            ? Text('Calling iTag',
-                                style: TextStyle(color: Colors.white))
-                            : Text('Call iTag',
-                                style: TextStyle(color: Colors.white)),
+                      onPressed: () {
+                        setState(() {
+                          if (_btCharCallItag != null) {
+                            _isCallItag =
+                                !_isCallItag; // toggle calling iTag status
+                            int _sendVal = _isCallItag ? 1 : 0;
+                            _btCharCallItag!.write([_sendVal],
+                                withoutResponse:
+                                    true); // need to add bracket to _setVal bc. .write want List<int>
+                            // if (_btCharNotifyPressItagBt != null) {
+                            //   print('callback331');
+                            //   _btCharNotifyPressItagBt!.value.listen((value) {
+                            //     print(
+                            //         'callback332 of _btCharCallItag value=${value}');
+                            //   });
+                            //   print('callback333');
+                            // } else {
+                            //   print('callback334');
+                            // }
+                          }
+                        });
+                      },
+                      child: (_isCallItag)
+                          ? Text('Calling iTag',
+                              style: TextStyle(color: Colors.white))
+                          : Text('Call iTag',
+                              style: TextStyle(color: Colors.white)),
                       style: ElevatedButton.styleFrom(
                         // onPrimary: Colors.green, // สี bg ของปุ่มจังหวะที่กดลง
                         // primary: Colors.yellow, // สี bg ของปุ่มจังหวะปกติ (ตอนที่ยังไม่ได้กดลง)
                         primary: (_isCallItag) // สี bg ของปุ่ม แบบมีเงื่อนไข
-                          ? Colors.green // elevated bt bg color when call iTag
-                          : null, // use default color
+                            ? Colors
+                                .green // elevated bt bg color when call iTag
+                            : null, // use default color
                       ),
                     )
                   ],

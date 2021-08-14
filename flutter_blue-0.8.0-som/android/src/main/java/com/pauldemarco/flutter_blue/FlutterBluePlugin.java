@@ -599,8 +599,7 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
                         return;
                     }
                 } else {
-                    result.error("set_notification_error", "!!JUST WARNING NOT ERROR: Som Api. edit code to bypass error when cccDescriptor is null ", null);
-                    return;
+                    Log.w("FlutterBluePlugin.java set_notification_warning","!!JUST WARNING NOT ERROR: Som Api. edit code to bypass error when cccDescriptor is null ");
                 }
                 // end edited by Som Api. 20210813: edited new code
 
