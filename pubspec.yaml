@@ -31,6 +31,9 @@ dependencies:
   flutter_blue:
     path: ./flutter_blue-0.8.0-som/
 
+  # use vibration plugin (version ^1.7.4-nullsafety.0 is pre-release version)
+  vibration: ^1.7.4-nullsafety.0
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

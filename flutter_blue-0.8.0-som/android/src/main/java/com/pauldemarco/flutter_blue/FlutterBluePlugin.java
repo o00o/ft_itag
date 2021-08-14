@@ -327,6 +327,7 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
                     if(state == BluetoothProfile.STATE_DISCONNECTED) {
                         gattServer.close();
                     }
+                    // gattServer.close(); // test by som api. 20210814 --> add this line for fixing bug multiple sending notify characteristic --> result: not solve the bug
                 }
                 result.success(null);
                 break;
@@ -513,7 +514,8 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
                     return;
                 }
 
-                result.success(null);
+                result.success(null);gattServer.disconnect();
+//                gattServer.close(); // test by som api. 20210814 --> add this line for fixing bug multiple sending notify characteristic --> result: not solve the bug
                 break;
             }
 

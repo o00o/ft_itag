@@ -1,8 +1,24 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'dart:async';
+import 'package:vibration/vibration.dart'; // use vibration
+
+
+Timer? timerVibrate; // timer used for control toggle start-stop vibrate
+bool flagStartVibrate = false;
+bool vibrateStatus = false;
+var notifyStreamPressingItag = null;
+
+void vibrateAction() {
+  vibrateStatus = !vibrateStatus;
+  if (vibrateStatus) {
+    // vibrate with pattern (wait 200ms, vibrate 1s, wait 200ms, vibrate 1s)
+    Vibration.vibrate(pattern: [200, 1000, 200, 1000]);
+  }
+}
 
 class SensorPage extends StatefulWidget {
   const SensorPage({Key? key, required this.device}) : super(key: key);
@@ -26,6 +42,35 @@ class _SensorPageState extends State<SensorPage> {
     super.initState();
 
     connectToDevice();
+  }
+
+  @override
+  Future<void> dispose() async {
+    super.dispose();
+
+    timerVibrate?.cancel();
+
+    if (notifyStreamPressingItag != null) {
+      notifyStreamPressingItag.cancel();
+      print('cancel notifyStreamPressingItag');
+    }
+
+    // if (_btCharNotifyPressItagBt != null) {
+    //   _btCharNotifyPressItagBt!.value.listen((value) { //ok
+    //   }).cancel();
+    //   print('cancel notify listen');
+    // }
+
+
+    // if (_btCharNotifyPressItagBt != null) {
+    //   await _btCharNotifyPressItagBt!.setNotifyValue(false);
+    //   print('cancel notify pressing iTag button');
+    // }
+
+    await widget.device.disconnect();
+    print('disconnect ble');
+
+    print('pop sensor_page');
   }
 
   connectToDevice() async {
@@ -110,8 +155,21 @@ class _SensorPageState extends State<SensorPage> {
           //                    0000ffe1-0000-1000-8000-00805f9b34fb
           print('match iTag button char. uuid');
           _btCharNotifyPressItagBt = characteristic;
-          _btCharNotifyPressItagBt!.value.listen((value) { //ok
-            print('callback0 of _btCharCallItag value=${value}');
+          notifyStreamPressingItag = _btCharNotifyPressItagBt!.value.listen((value) { //ok
+            print('callback0 of _btCharCallItag value=${value}, value type=${value.runtimeType}');
+
+            if (value.isNotEmpty) { // if the buffer has any value, it is occurred from pressing iTag
+              // start vibrate (+ start timer for control vibrate)
+              flagStartVibrate = !flagStartVibrate;
+              print('flagStartVibrate = $flagStartVibrate');
+              if (flagStartVibrate) {
+                timerVibrate = Timer.periodic(Duration(seconds: 3), (Timer t) => vibrateAction());
+              } else {
+                vibrateStatus = false;
+                timerVibrate?.cancel();
+              }
+            }
+
           });
 
           print('start setting notify to true');

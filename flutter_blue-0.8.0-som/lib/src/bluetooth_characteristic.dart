@@ -23,7 +23,7 @@ class BluetoothCharacteristic {
 
   BehaviorSubject<List<int>> _value;
   Stream<List<int>> get value => Rx.merge([
-        _value.stream,
+        _value.stream, // test by som api. 20210814 --> comment this line for fixing bug multiple sending notify characteristic --> result: not solve the bug
         _onValueChangedStream,
       ]);
 
